@@ -1,0 +1,66 @@
+# DropProbe curated config DB (v0.1, author-maintained).
+#
+# Each entry maps a carousel drop (model_id == HuggingFace repo id) to the
+# candidate GGUF quants, backend fork, and day-0 tooling-readiness that the
+# probe layer needs. Hand-curated per weekly drop — a community PR flow is
+# out of scope for v0.1 (the first external config-DB PR is the kill-criterion
+# signal the plan watches for).
+#
+# Axes: tooling.{comfyui,llama_cpp,ollama} ∈ {day-0, supported, none}
+
+drops:
+  moonshotai/Kimi-K3-Instruct:
+    quants:
+      - {name: Q2_K, size_gb: 39.5, source_repo: "GrEarl/Kimi-K3-GGUF"}
+      - {name: Q4_K_M, size_gb: 68.2, source_repo: "GrEarl/Kimi-K3-GGUF"}
+      - {name: Q6_K, size_gb: 80.0, source_repo: "GrEarl/Kimi-K3-GGUF"}
+    backend:
+      fork_repo: "pwilkin/llama.cpp"
+      fork_ref: "kimi-k3-text"
+      engine: llama.cpp
+    context_len: 131072
+    tooling: {comfyui: none, llama_cpp: day-0, ollama: none}
+
+  deepseek-ai/DeepSeek-V4-Flash:
+    quants:
+      - {name: Q2_K, size_gb: 29.0, source_repo: "bartowski/DeepSeek-V4-Flash-GGUF"}
+      - {name: Q4_K_M, size_gb: 49.5, source_repo: "bartowski/DeepSeek-V4-Flash-GGUF"}
+    backend:
+      fork_repo: "ggml-org/llama.cpp"
+      fork_ref: "master"
+      engine: llama.cpp
+    context_len: 65536
+    tooling: {comfyui: none, llama_cpp: day-0, ollama: supported}
+
+  zhipuai/GLM-5.5-9B-Chat:
+    quants:
+      - {name: Q4_K_M, size_gb: 5.9, source_repo: "bartowski/GLM-5.5-9B-Chat-GGUF"}
+      - {name: Q5_K_M, size_gb: 6.8, source_repo: "bartowski/GLM-5.5-9B-Chat-GGUF"}
+    backend:
+      fork_repo: "ggml-org/llama.cpp"
+      fork_ref: "master"
+      engine: llama.cpp
+    context_len: 32768
+    tooling: {comfyui: none, llama_cpp: day-0, ollama: day-0}
+
+  Qwen/Qwen3-Next-80B:
+    quants:
+      - {name: Q2_K, size_gb: 33.6, source_repo: "Qwen/Qwen3-Next-80B-GGUF"}
+      - {name: Q4_K_M, size_gb: 49.0, source_repo: "Qwen/Qwen3-Next-80B-GGUF"}
+    backend:
+      fork_repo: "ggml-org/llama.cpp"
+      fork_ref: "master"
+      engine: llama.cpp
+    context_len: 131072
+    tooling: {comfyui: none, llama_cpp: supported, ollama: day-0}
+
+  MiniMaxAI/MiniMax-H3:
+    quants:
+      - {name: Q4_K_M, size_gb: 44.0, source_repo: "bartowski/MiniMax-H3-GGUF"}
+      - {name: Q8_0, size_gb: 79.5, source_repo: "bartowski/MiniMax-H3-GGUF"}
+    backend:
+      fork_repo: "comfyanonymous/ComfyUI"
+      fork_ref: "master"
+      engine: llama.cpp
+    context_len: 131072
+    tooling: {comfyui: day-0, llama_cpp: supported, ollama: none}

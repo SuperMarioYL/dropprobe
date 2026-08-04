@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 340" width="880" height="340"
+     font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif"
+     role="img" aria-label="Architecture: lab/HF feed and hardware detect flow into the smoke-probe, which feeds the report.">
+  <defs>
+    <marker id="ah-d" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L6,3 L0,6 Z" fill="#5A5A66"/>
+    </marker>
+  </defs>
+  <rect x="0" y="0" width="880" height="340" fill="#1D1D1F"/>
+
+  <!-- static connectors (bottom layer) -->
+  <g stroke="#3A3A44" stroke-width="1.5" fill="none">
+    <line x1="218" y1="150" x2="273" y2="150" marker-end="url(#ah-d)"/>
+    <line x1="413" y1="150" x2="468" y2="150" marker-end="url(#ah-d)"/>
+    <line x1="608" y1="150" x2="663" y2="150" marker-end="url(#ah-d)"/>
+    <line x1="538" y1="240" x2="538" y2="190" marker-end="url(#ah-d)"/>
+  </g>
+
+  <!-- marching-dash data flow (top layer); period=16, from 32→0 = 2 periods → seamless -->
+  <g stroke-width="1.5" fill="none" stroke-linecap="round">
+    <line x1="218" y1="150" x2="269" y2="150" stroke="#4DA3FF" stroke-opacity="0.55" stroke-dasharray="6 10">
+      <animate attributeName="stroke-dashoffset" from="32" to="0" dur="1.6s" repeatCount="indefinite"/>
+    </line>
+    <line x1="413" y1="150" x2="464" y2="150" stroke="#8985FF" stroke-opacity="0.55" stroke-dasharray="6 10">
+      <animate attributeName="stroke-dashoffset" from="32" to="0" dur="1.6s" begin="-0.53s" repeatCount="indefinite"/>
+    </line>
+    <line x1="608" y1="150" x2="659" y2="150" stroke="#2DC79A" stroke-opacity="0.55" stroke-dasharray="6 10">
+      <animate attributeName="stroke-dashoffset" from="32" to="0" dur="1.6s" begin="-1.07s" repeatCount="indefinite"/>
+    </line>
+    <line x1="538" y1="240" x2="538" y2="191" stroke="#8985FF" stroke-opacity="0.55" stroke-dasharray="6 10">
+      <animate attributeName="stroke-dashoffset" from="32" to="0" dur="1.6s" begin="-0.8s" repeatCount="indefinite"/>
+    </line>
+  </g>
+
+  <!-- data packets along connectors (animateMotion + opacity fade) -->
+  <g>
+    <circle r="3" fill="#4DA3FF">
+      <animateMotion path="M218,150 L269,150" dur="2.4s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.15;0.85;1" dur="2.4s" repeatCount="indefinite"/>
+    </circle>
+    <circle r="3" fill="#8985FF">
+      <animateMotion path="M413,150 L464,150" dur="2.4s" begin="-1.2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.15;0.85;1" dur="2.4s" begin="-1.2s" repeatCount="indefinite"/>
+    </circle>
+    <circle r="3" fill="#2DC79A">
+      <animateMotion path="M608,150 L659,150" dur="2.4s" begin="-0.6s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.15;0.85;1" dur="2.4s" begin="-0.6s" repeatCount="indefinite"/>
+    </circle>
+    <circle r="3" fill="#8985FF">
+      <animateMotion path="M538,240 L538,191" dur="2.4s" begin="-1.8s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.15;0.85;1" dur="2.4s" begin="-1.8s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+
+  <!-- main row nodes: drops → hardware → probe → report -->
+  <g>
+    <rect x="78" y="110" width="140" height="80" rx="15" fill="#4DA3FF" fill-opacity="0.16" stroke="#4DA3FF" stroke-width="1.5">
+      <animate attributeName="fill-opacity" values="0.16;0.24;0.16" keyTimes="0;0.5;1" dur="3.2s" calcMode="spline" keySplines="0.4 0 0.6 1;0.4 0 0.6 1" repeatCount="indefinite"/>
+    </rect>
+    <text x="148" y="145" text-anchor="middle" font-size="15" font-weight="600" fill="#4DA3FF">drops.py</text>
+    <text x="148" y="166" text-anchor="middle" font-size="11" fill="#A1A1A8">lab / HF feed</text>
+
+    <rect x="273" y="110" width="140" height="80" rx="15" fill="#8985FF" fill-opacity="0.16" stroke="#8985FF" stroke-width="1.5">
+      <animate attributeName="fill-opacity" values="0.16;0.24;0.16" keyTimes="0;0.5;1" dur="3.2s" begin="-0.8s" calcMode="spline" keySplines="0.4 0 0.6 1;0.4 0 0.6 1" repeatCount="indefinite"/>
+    </rect>
+    <text x="343" y="145" text-anchor="middle" font-size="15" font-weight="600" fill="#8985FF">hardware.py</text>
+    <text x="343" y="166" text-anchor="middle" font-size="11" fill="#A1A1A8">VRAM · RAM · disk</text>
+
+    <rect x="468" y="110" width="140" height="80" rx="15" fill="#2DC79A" fill-opacity="0.16" stroke="#2DC79A" stroke-width="1.5">
+      <animate attributeName="fill-opacity" values="0.16;0.24;0.16" keyTimes="0;0.5;1" dur="3.2s" begin="-1.6s" calcMode="spline" keySplines="0.4 0 0.6 1;0.4 0 0.6 1" repeatCount="indefinite"/>
+    </rect>
+    <text x="538" y="145" text-anchor="middle" font-size="15" font-weight="600" fill="#2DC79A">probe.py</text>
+    <text x="538" y="166" text-anchor="middle" font-size="11" fill="#A1A1A8">llama.cpp · 30s</text>
+
+    <rect x="663" y="110" width="140" height="80" rx="15" fill="#4DA3FF" fill-opacity="0.16" stroke="#4DA3FF" stroke-width="1.5">
+      <animate attributeName="fill-opacity" values="0.16;0.24;0.16" keyTimes="0;0.5;1" dur="3.2s" begin="-2.4s" calcMode="spline" keySplines="0.4 0 0.6 1;0.4 0 0.6 1" repeatCount="indefinite"/>
+    </rect>
+    <text x="733" y="145" text-anchor="middle" font-size="15" font-weight="600" fill="#4DA3FF">report.py</text>
+    <text x="733" y="166" text-anchor="middle" font-size="11" fill="#A1A1A8">rich table · --json</text>
+  </g>
+
+  <!-- config DB side feed into probe -->
+  <g>
+    <rect x="468" y="240" width="140" height="64" rx="14" fill="#8985FF" fill-opacity="0.16" stroke="#8985FF" stroke-width="1.5"/>
+    <text x="538" y="270" text-anchor="middle" font-size="13" font-weight="600" fill="#8985FF">config_db.yaml</text>
+    <text x="538" y="288" text-anchor="middle" font-size="10" fill="#A1A1A8">fork · quant · tooling</text>
+  </g>
+</svg>

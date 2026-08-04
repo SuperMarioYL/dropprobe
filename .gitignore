@@ -1,0 +1,43 @@
+# build scratch
+*.egg-info/
+*.egg
+build/
+dist/
+.eggs/
+__pycache__/
+*.py[cod]
+*$py.class
+
+# virtualenvs
+.venv/
+venv/
+env/
+
+# test / coverage
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# editors / OS
+.DS_Store
+.idea/
+.vscode/
+
+# local model cache (never ship weights)
+*.gguf
+*.safetensors
+models/
+.cache/
+
+# internal build scaffolding — never tracked
+BUILD_SETUP_NEXT_STEPS.md
+PUBLISH_BLOCKED.md
+.spawn.*
+.builder_*
+.build_metadata*
+.stage_*
+.claude/
+CLAUDE.md
