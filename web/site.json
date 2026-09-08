@@ -1,0 +1,229 @@
+{
+  "schema": 3,
+  "name": "DropProbe",
+  "github": "https://github.com/SuperMarioYL/dropprobe",
+  "host": "dropprobe.lei6393.com",
+  "palette": "auto",
+  "lang": {
+    "primary": "zh",
+    "toggle": true
+  },
+  "meta": {
+    "visual_profile": "neon-particle",
+    "demo_source": "docs/demo-results.json",
+    "implementation_version": "0.1.0"
+  },
+  "hero": {
+    "eyebrow": {
+      "zh": "模型条目 · 硬件与静态配置",
+      "en": "MODEL ENTRIES · HARDWARE AND CONFIGURATION"
+    },
+    "headline": {
+      "zh": "先整理候选配置，\n再验证能不能跑。",
+      "en": "Inspect the candidate.\nThen verify the runtime."
+    },
+    "sub": {
+      "zh": "DropProbe 汇总选定模型组织近期更新的条目与本机硬件画像，并提供候选量化、后端和工具状态的静态配置结构。",
+      "en": "DropProbe lists recently updated repositories from selected model organizations alongside local hardware information and provides static candidate quantization, backend and tooling records."
+    },
+    "href": "#quickstart",
+    "cta": {
+      "zh": "运行示例",
+      "en": "Run the example"
+    },
+    "ctaGithub": {
+      "zh": "查看源码",
+      "en": "View source"
+    }
+  },
+  "scene": {
+    "kind": "neon-graph",
+    "fallback": "/assets/presentation/scene-dark.svg",
+    "fallbackLight": "/assets/presentation/scene-light.svg",
+    "caption": {
+      "zh": "分开看配置线索与实际试跑",
+      "en": "Separate configuration hints from a real probe."
+    }
+  },
+  "advantages": [
+    {
+      "title": {
+        "zh": "合并分散线索",
+        "en": "Combine configuration hints"
+      },
+      "body": {
+        "zh": "模型标识、硬件字段和候选配置形成一个对象。",
+        "en": "Model identity, hardware fields and candidates form one object."
+      }
+    },
+    {
+      "title": {
+        "zh": "明确尚未测量",
+        "en": "Mark unmeasured results"
+      },
+      "body": {
+        "zh": "smoke_probe_ok 保持 null，不伪造试跑成功。",
+        "en": "smoke_probe_ok remains null rather than inventing probe success."
+      }
+    },
+    {
+      "title": {
+        "zh": "保留离线接口",
+        "en": "Keep an offline interface"
+      },
+      "body": {
+        "zh": "Python API 可用显式输入检查静态组装，无需下载权重。",
+        "en": "The Python API accepts explicit inputs for static assembly without downloading weights."
+      }
+    }
+  ],
+  "story": {
+    "intro": {
+      "title": {
+        "zh": "分开看配置线索与实际试跑",
+        "en": "Separate configuration hints from a real probe."
+      },
+      "body": {
+        "zh": "准备尝试一个模型时，下载地址、量化大小、后端分支和机器内存通常分散在不同地方。先把这些线索放在一起有助于规划下一步，但静态容量计算不能证明推理会成功。当前版本停留在发现与静态组装，真实 smoke probe 尚未接入。",
+        "en": "Preparing to try a model involves repository locations, quantization sizes, backend branches and machine memory. Collecting these hints helps plan the next step, but static capacity arithmetic cannot prove inference succeeds. This version provides discovery and static assembly; real smoke probing is not wired in."
+      }
+    },
+    "sections": [
+      {
+        "title": {
+          "zh": "从输入到结果",
+          "en": "From input to result"
+        },
+        "body": {
+          "zh": "示例显式声明 8 GiB 与 2 GiB 两种 CPU RAM，候选 Q4 为 4 GiB、Q8 为 8 GiB。两种情况下都选最小候选 Q4；前者 runnable 字段为 true，后者为 null，但两者 probe_status 均为 not_probed，smoke_probe_ok 均为 null。true 在这里仅是静态容量提示。",
+          "en": "The example explicitly declares CPU RAM profiles of 8 GiB and 2 GiB, with 4 GiB Q4 and 8 GiB Q8 candidates. Both select the smallest candidate, Q4. runnable is true for the first and null for the second, but both have not_probed status and null smoke_probe_ok. Here true is only a static capacity hint."
+        },
+        "image": {
+          "light": "/assets/presentation/process-light.svg",
+          "dark": "/assets/presentation/process-dark.svg",
+          "alt": {
+            "zh": "从输入到结果",
+            "en": "From input to result"
+          }
+        }
+      },
+      {
+        "title": {
+          "zh": "实现中的分工",
+          "en": "How the implementation fits together"
+        },
+        "body": {
+          "zh": "drops 从固定组织列表查询 Hub 条目，hardware 探测可用硬件信息，config_db 读取打包的 YAML。build_probe_card 将它们合并并选择最小候选量化。probe_drop 当前直接返回 NOT_PROBED，report 将列表、硬件或 API 提供的卡片转为表格/JSON。",
+          "en": "drops queries Hub entries for a fixed organization list, hardware gathers available device information, and config_db loads bundled YAML. build_probe_card combines these records and selects the smallest candidate quantization. probe_drop currently returns NOT_PROBED; report renders lists, hardware or API-supplied cards as tables/JSON."
+        },
+        "image": {
+          "light": "/assets/presentation/architecture-light.svg",
+          "dark": "/assets/presentation/architecture-dark.svg",
+          "alt": {
+            "zh": "实现中的分工",
+            "en": "How the implementation fits together"
+          }
+        }
+      },
+      {
+        "title": {
+          "zh": "接入现有工作流",
+          "en": "Connect existing workflows"
+        },
+        "body": {
+          "zh": "DropProbe 汇总选定模型组织近期更新的条目与本机硬件画像，并提供候选量化、后端和工具状态的静态配置结构。",
+          "en": "DropProbe lists recently updated repositories from selected model organizations alongside local hardware information and provides static candidate quantization, backend and tooling records."
+        },
+        "image": {
+          "light": "/assets/presentation/integrations-light.svg",
+          "dark": "/assets/presentation/integrations-dark.svg",
+          "alt": {
+            "zh": "接入现有工作流",
+            "en": "Connect existing workflows"
+          }
+        }
+      }
+    ],
+    "details": [
+      {
+        "title": {
+          "zh": "配置与边界",
+          "en": "Configuration and limits"
+        },
+        "body": {
+          "zh": "live smoke probe 未实现，runnable 的静态 true 不能当作推理成功。",
+          "en": "Live smoke probing is unimplemented; static runnable=true is not successful inference."
+        }
+      }
+    ]
+  },
+  "demo": {
+    "title": {
+      "zh": "运行自带示例",
+      "en": "Run the supplied example"
+    },
+    "note": {
+      "zh": "v0.1.0 的真实静态组装 API 输出。所有模型、后端和硬件值均为构造输入，不是下载、实际机器检测或推理成功记录。",
+      "en": "Real static-assembly API output from v0.1.0. Model, backend and hardware values are constructed inputs, not downloads, detected hardware or successful inference records."
+    },
+    "source": "https://github.com/SuperMarioYL/dropprobe/blob/main/docs/demo-results.json",
+    "steps": [
+      {
+        "label": {
+          "zh": "运行 1",
+          "en": "Run 1"
+        },
+        "body": {
+          "zh": "示例显式声明 8 GiB 与 2 GiB 两种 CPU RAM，候选 Q4 为 4 GiB、Q8 为 8 GiB。两种情况下都选最小候选 Q4；前者 runnable 字段为 true，后者为 null，但两者 probe_status 均为 not_probed，smoke_probe_ok 均为 null。true 在这里仅是静态容量提示。",
+          "en": "The example explicitly declares CPU RAM profiles of 8 GiB and 2 GiB, with 4 GiB Q4 and 8 GiB Q8 candidates. Both select the smallest candidate, Q4. runnable is true for the first and null for the second, but both have not_probed status and null smoke_probe_ok. Here true is only a static capacity hint."
+        },
+        "image": "/assets/presentation/demo-0-light.svg",
+        "imageDark": "/assets/presentation/demo-0-dark.svg",
+        "command": "python examples/presentation_demo.py",
+        "output": "[\n  {\n    \"declared_ram_gb\": 8.0,\n    \"selected_quant\": \"Q4\",\n    \"runnable_field\": true,\n    \"probe_status\": \"not_probed\",\n    \"smoke_probe_ok\": null\n  },\n  {\n    \"declared_ram_gb\": 2.0,\n    \"selected_quant\": \"Q4\",\n    \"runnable_field\": null,\n    \"probe_status\": \"not_probed\",\n    \"smoke_probe_ok\": null\n  }\n]\n"
+      }
+    ]
+  },
+  "quickstart": {
+    "title": {
+      "zh": "运行完整示例",
+      "en": "Run the complete example"
+    },
+    "body": {
+      "zh": "需要 Python 3.12+。安装可能联网；先运行不访问 Hub、不探测机器、不启动模型的静态示例。",
+      "en": "Requires Python 3.12+. Installation may need network access; start with the static example, which neither queries the Hub, detects the machine nor launches a model."
+    },
+    "steps": [
+      {
+        "title": {
+          "zh": "准备环境",
+          "en": "Prepare the environment"
+        },
+        "code": "git clone https://github.com/SuperMarioYL/dropprobe.git\ncd dropprobe\npython3 -m venv .venv\nsource .venv/bin/activate\npython -m pip install -e ."
+      },
+      {
+        "title": {
+          "zh": "运行本地示例",
+          "en": "Run the local example"
+        },
+        "code": "python examples/presentation_demo.py"
+      }
+    ]
+  },
+  "limitations": [
+    {
+      "zh": "live smoke probe 未实现，runnable 的静态 true 不能当作推理成功。",
+      "en": "Live smoke probing is unimplemented; static runnable=true is not successful inference."
+    },
+    {
+      "zh": "打包配置和最近更新时间不证明当前后端支持或正式模型发布时间。",
+      "en": "Bundled declarations and modification timestamps do not prove current backend support or original release dates."
+    }
+  ],
+  "footer": {
+    "tag": {
+      "zh": "Python 3.12+ · MIT",
+      "en": "Python 3.12+ · MIT"
+    }
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "mode": "auto",
+  "id": "e6a556-dce76a-f6baac-2a90f9105f5c",
+  "identity": "https://github.com/supermarioyl/dropprobe",
+  "primary": "#e6a556",
+  "secondary": "#dce76a",
+  "highlight": "#f6baac",
+  "dark": {
+    "bg": "#0a0a0d",
+    "panel": "#131417",
+    "code": "#141213",
+    "ink": "#fdf1ee",
+    "muted": "#b2aca8",
+    "line": "#3a2c1d",
+    "primary": "#e6a556",
+    "secondary": "#dce76a",
+    "highlight": "#f6baac",
+    "accent": "#e6a556",
+    "buttonStart": "#9a6e3a",
+    "buttonEnd": "#767b39",
+    "buttonText": "#ffffff"
+  },
+  "light": {
+    "bg": "#fefcf9",
+    "panel": "#fefbf7",
+    "code": "#fdf9f3",
+    "ink": "#27211c",
+    "muted": "#726e6b",
+    "line": "#f7e4cb",
+    "primary": "#956b38",
+    "secondary": "#727737",
+    "highlight": "#8e6b63",
+    "accent": "#956b38",
+    "buttonStart": "#9a6e3a",
+    "buttonEnd": "#767b39",
+    "buttonText": "#ffffff"
+  }
+}

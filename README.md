@@ -1,148 +1,115 @@
-[English](./README.en.md) | **简体中文**
+[English](README.en.md) | **简体中文**
 
-<div align="right"><sub><b>简体中文</b>&nbsp;&nbsp;⇄&nbsp;&nbsp;<a href="./README.en.md">English</a></sub></div>
-
-<p align="center">
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./assets/hero-cn-dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="./assets/hero-cn-light.svg">
-  <img src="./assets/hero-cn-light.svg" width="880" alt="DropProbe — 每周开放权重 drop 的一键烟雾测试">
+  <source media="(max-width: 640px) and (prefers-color-scheme: dark)" srcset="assets/presentation/hero-mobile-dark.svg">
+  <source media="(max-width: 640px)" srcset="assets/presentation/hero-mobile-light.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="assets/presentation/hero-dark.svg">
+  <img src="assets/presentation/hero-light.svg" width="960" alt="DropProbe — Separate configuration hints from a real probe.">
 </picture>
-</p>
 
-<p align="center"><sub>每周开放权重模型 drop 的一键烟雾测试 —— 在你自己的硬件上 30 秒试跑，告诉你哪个 fork / quant / 配置能跑起来。</sub></p>
+**DropProbe 汇总选定模型组织近期更新的条目与本机硬件画像，并提供候选量化、后端和工具状态的静态配置结构。**
 
-<p align="center">
-  <a href="./LICENSE"><img src="https://img.shields.io/github/license/SuperMarioYL/dropprobe?color=blue&label=license" alt="license"></a>
-  <a href="https://github.com/SuperMarioYL/dropprobe/releases"><img src="https://img.shields.io/github/v/release/SuperMarioYL/dropprobe?label=release" alt="release"></a>
-  <a href="https://github.com/SuperMarioYL/dropprobe/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/SuperMarioYL/dropprobe/ci.yml?branch=main&label=ci" alt="ci"></a>
-  <img src="https://img.shields.io/badge/python-3.12%2B-blue" alt="python">
-</p>
+`Python 3.12+` · [MIT](LICENSE) · [GitHub](https://github.com/SuperMarioYL/dropprobe) · [网站](https://dropprobe.lei6393.com)
 
-**每周都有新的开放权重模型 drop，但你得手动找 fork、猜 GGUF quant、查 day-0 支持。DropProbe 用一条命令对你本机硬件烟雾测试每个新 drop，直接给出能跑的 fork / quant / config。**
+## 为什么需要它
 
-<h2><img src="https://api.iconify.design/tabler/topology-star-3.svg?color=%230071E3&width=24" height="22" align="absmiddle" alt=""> 架构</h2>
+准备尝试一个模型时，下载地址、量化大小、后端分支和机器内存通常分散在不同地方。先把这些线索放在一起有助于规划下一步，但静态容量计算不能证明推理会成功。当前版本停留在发现与静态组装，真实 smoke probe 尚未接入。
 
-<p align="center">
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./assets/atlas-dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="./assets/atlas-light.svg">
-  <img src="./assets/atlas-light.svg" width="880" alt="架构：lab/HF feed 与硬件检测汇入 smoke-probe，再输出 ProbeCard 报告">
+  <source media="(max-width: 640px) and (prefers-color-scheme: dark)" srcset="assets/presentation/process-mobile-dark.svg">
+  <source media="(max-width: 640px)" srcset="assets/presentation/process-mobile-light.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="assets/presentation/process-dark.svg">
+  <img src="assets/presentation/process-light.svg" width="960" alt="Two declared memory profiles">
 </picture>
-</p>
 
-数据流：`drops.py` 从 HF 拉本周 carousel → `hardware.py` 探测本机 VRAM / RAM / 磁盘 → `probe.py` 用最小可行 quant 跑 30 秒试推理 → `report.py` 输出 rich 表 / `--json`。`config_db.yaml` 把每个 drop 的 fork / quant / day-0 工具就绪度喂给探针层。
+## 架构
 
-## 目录
+drops 从固定组织列表查询 Hub 条目，hardware 探测可用硬件信息，config_db 读取打包的 YAML。build_probe_card 将它们合并并选择最小候选量化。probe_drop 当前直接返回 NOT_PROBED，report 将列表、硬件或 API 提供的卡片转为表格/JSON。
 
-- [为什么造这个](#为什么造这个)
-- [安装](#安装)
-- [快速开始](#快速开始)
-- [用法](#用法)
-- [Demo](#demo)
-- [路线图](#路线图)
-- [License](#license)
+<picture>
+  <source media="(max-width: 640px) and (prefers-color-scheme: dark)" srcset="assets/presentation/architecture-mobile-dark.svg">
+  <source media="(max-width: 640px)" srcset="assets/presentation/architecture-mobile-light.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="assets/presentation/architecture-dark.svg">
+  <img src="assets/presentation/architecture-light.svg" width="960" alt="Discovery and static candidate assembly">
+</picture>
 
-<h2><img src="https://api.iconify.design/tabler/bulb.svg?color=%230071E3&width=24" height="22" align="absmiddle" alt=""> 为什么造这个</h2>
+## 安装
 
-r/LocalLLaMA 有句话说「the open-weights carousel never stops」—— DeepSeek、Kimi、GLM、Qwen、MiniMax 几乎每周轮替 drop，但每个 drop 你都得手动重做一遍：哪个 llama.cpp fork 支持它、哪个 GGUF quant 放得进你的 VRAM、ComfyUI / llama.cpp 有没有加 day-0 支持。最痛的案例是有人因为「在我的机器上没法试」干脆自己用 C99 写了个推理引擎。DropProbe 把这套重复的体力活压成一条命令：在你**真实的硬件**上对每个新 drop 跑 30 秒试推理，吐出一张能直接复制运行命令的 ProbeCard 表。静态 VRAM 算术只能告诉你 quant 放不放得下；烟雾测试能告诉你 fork **到底跑不跑得起来**。
-
-<h2><img src="https://api.iconify.design/tabler/rocket.svg?color=%230071E3&width=24" height="22" align="absmiddle" alt=""> 安装</h2>
+需要 Python 3.12+。安装可能联网；先运行不访问 Hub、不探测机器、不启动模型的静态示例。
 
 ```bash
-# 推荐用 uv（< 30 秒，不在安装期拉任何模型权重）
-uv tool install dropprobe
-# 或用 pipx
-pipx install dropprobe
+git clone https://github.com/SuperMarioYL/dropprobe.git
+cd dropprobe
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -e .
 ```
 
-> 需要本机有 `llama.cpp`（`llama-cli`）或 `ollama` 在 PATH 上。m2 烟雾测试会自动选一个；两个都没有时退化为只列出 drop + 硬件画像（m1 行为）。
-
-<h2><img src="https://api.iconify.design/tabler/rocket.svg?color=%230071E3&width=24" height="22" align="absmiddle" alt=""> 快速开始</h2>
+## 快速开始
 
 ```bash
-# 1. 安装
-uv tool install dropprobe
-# 2. 列出本周 drop + 你的硬件画像（m1 —— 还不跑探针）
+python examples/presentation_demo.py
+```
+
+示例显式声明 8 GiB 与 2 GiB 两种 CPU RAM，候选 Q4 为 4 GiB、Q8 为 8 GiB。两种情况下都选最小候选 Q4；前者 runnable 字段为 true，后者为 null，但两者 probe_status 均为 not_probed，smoke_probe_ok 均为 null。true 在这里仅是静态容量提示。
+
+## 用法
+
+```bash
+# 以下命令会查询 Hugging Face 并检测本机
 dropprobe latest --list
-# 3. （m2 起）跑烟雾测试，复制能跑的运行命令
-dropprobe latest
-```
-
-<details><summary>样例输出（m1 <code>--list</code>）</summary>
-
-```
-DropProbe 0.1.0 — fetching the last 7d of drops...
-
-This week's open-weight drops
- Model                                  Lab       Drop date   Files
- moonshotai/Kimi-K3-Instruct           Kimi      2026-08-01    14
- deepseek-ai/DeepSeek-V4-Flash         DeepSeek  2026-07-30    22
- zhipuai/GLM-5.5-9B-Chat               GLM       2026-07-29     8
- Qwen/Qwen3-Next-80B                   Qwen      2026-07-27    19
- MiniMaxAI/MiniMax-H3                  MiniMax   2026-07-26    31
-
-Your hardware
- Axis             Value
- GPU arch         nvidia
- GPU              NVIDIA GeForce RTX 5090
- GPU count        2
- VRAM (GiB)       48.0
- RAM (GiB)        128.0
- Disk free (GiB)  512.0
-```
-
-</details>
-
-<h2><img src="https://api.iconify.design/tabler/terminal-2.svg?color=%230071E3&width=24" height="22" align="absmiddle" alt=""> 用法</h2>
-
-```bash
-# 只看本周 carousel + 本机硬件（m1 已可用 —— 探针在 m2）
-dropprobe latest --list
-
-# 指定回看窗口（默认 7 天，carousel 节奏）
 dropprobe latest --list --window 14
-
-# 指定模型缓存目录（用于测量真实可用磁盘）
-dropprobe latest --list --cache-dir /data/hf
-
-# m2 起：跑 30 秒烟雾测试，每个 drop 出一张 ProbeCard
-dropprobe latest
-
-# m3 起：导出完整 JSON 报告
-dropprobe latest --json > report.json
-
-# 版本
+dropprobe latest --list --cache-dir /path/to/model-cache --json
 dropprobe --version
 ```
 
-核心数据原语是 **ProbeCard** —— 每个 drop 一条可运行配置记录：
+不带 --list 的 latest 也不会在当前版本运行推理；NOT_PROBED 路径会退回列表。窗口日期优先使用 Hub lastModified，因而“近期条目”不一定等于首次发布的新模型。
 
-| 字段 | 含义 |
+## 能力与集成
+
+| 组成 | 当前支持 |
 |---|---|
-| `model_id` / `lab` / `drop_date` | 模型标识与发布信息 |
-| `hardware_profile` | 本机 VRAM / RAM / GPU 架构 / 磁盘 |
-| `quant` | 适配的 GGUF quant（名 / 体积 / 来源仓库，如 `Q2_K` 自 `GrEarl/Kimi-K3-GGUF`） |
-| `backend` | 跑得动的后端 fork（如 `pwilkin/llama.cpp` `kimi-k3-text`） |
-| `tooling` | day-0 工具就绪度（comfyui / llama_cpp / ollama） |
-| `runnable` / `smoke_probe_ok` | 烟雾测试结果 |
-| `run_cmd` | 可直接复制粘贴的运行命令 |
+| Hub 查询 | 固定组织及别名列表 |
+| 硬件 | NVML、ROCm 与 CPU/RAM/磁盘回退 |
+| YAML DB | 候选量化、后端引用、工具状态声明 |
+| Python API | Drop + HardwareProfile → ProbeCard |
+| 输出 | 列表/硬件表与 JSON |
 
-<h2><img src="https://api.iconify.design/tabler/photo.svg?color=%230071E3&width=24" height="22" align="absmiddle" alt=""> Demo</h2>
+<picture>
+  <source media="(max-width: 640px) and (prefers-color-scheme: dark)" srcset="assets/presentation/integrations-mobile-dark.svg">
+  <source media="(max-width: 640px)" srcset="assets/presentation/integrations-mobile-light.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="assets/presentation/integrations-dark.svg">
+  <img src="assets/presentation/integrations-light.svg" width="960" alt="Current data interfaces">
+</picture>
 
-<p align="center"><img src="./assets/demo.gif" width="880" alt="dropprobe latest --list 演示"></p>
+## 配置与边界
 
-原始录制在 `assets/demo.cast`（asciinema 格式）；`docs/demo.tape` 是可重放的 vhs 脚本，`.github/workflows/demo.yml` 按需重渲染 gif。
+--window 默认 7 天，CLI 接受 1–90；--cache-dir 用于选择磁盘空间检测位置。打包配置在 src/dropprobe/data/config_db.yaml，内容是维护者声明，不是实时后端验收。
 
-<h2><img src="https://api.iconify.design/tabler/map-2.svg?color=%230071E3&width=24" height="22" align="absmiddle" alt=""> 路线图</h2>
+静态 GPU 容量逻辑预留约 1.5 GiB；CPU 路径比较 RAM，不估计所有运行时开销。未检测到受支持 GPU 时可能归入 CPU，不代表机器没有其他加速器。Hub 请求失败可能得到空列表，不能据此断言没有更新。run_cmd 是未经本轮执行的文本模板，仍需核查实际后端参数。
 
-- [x] **m1 · 抓取 drop** —— 从 HF / lab 列表拉本周 carousel + 探测本机硬件；`dropprobe latest --list` 打印 drop + 硬件画像。
-- [ ] **m2 · 烟雾测试** —— 从 config_db 选最小可行 quant + 后端 fork，用 llama.cpp / ollama 跑 30 秒试推理，记录 `runnable` / `smoke_probe_ok`；`dropprobe latest` 跑探针。
-- [ ] **m3 · 出报告** —— 打印完整 ProbeCard 表（模型 / 适配 quant / VRAM / fork / 工具就绪 / 运行命令）+ `dropprobe latest --json` 导出。
-- [ ] 未来 —— 社区 PR 流水线给 config_db 加 drop 行（这是计划里盯着的「真实使用」信号）。
+## 运行记录
 
-<h2><img src="https://api.iconify.design/tabler/license.svg?color=%230071E3&width=24" height="22" align="absmiddle" alt=""> License</h2>
+v0.1.0 的真实静态组装 API 输出。所有模型、后端和硬件值均为构造输入，不是下载、实际机器检测或推理成功记录。
 
-MIT —— 见 [LICENSE](./LICENSE)。提 issue 或 PR 欢迎在 [GitHub Issues](https://github.com/SuperMarioYL/dropprobe/issues)。
+[输入、命令和完整输出](docs/demo-results.json)
 
-<p align="center"><sub><a href="./LICENSE">MIT</a> © 2026 SuperMarioYL</sub></p>
+## 路线图
+
+- [x] 近期条目查询和硬件画像。
+- [x] 静态配置 DB、ProbeCard 组装和 JSON 输出。
+- [ ] 真实模型下载/后端 smoke probe。
+- [ ] 经实际运行验证的配置与命令记录。
+
+当前没有固定“30 秒可运行”的保证。
+
+## 开发与许可证
+
+```bash
+python -m pip install -e ".[test]"
+python -m pytest
+```
+
+静态行为与 NOT_PROBED 契约见 [test_probe.py](tests/test_probe.py)。
+
+[MIT](LICENSE) · [Issues](https://github.com/SuperMarioYL/dropprobe/issues)

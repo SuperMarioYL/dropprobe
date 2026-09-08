@@ -1,0 +1,90 @@
+{
+  "name": "DropProbe",
+  "tagline": "Separate configuration hints from a real probe.",
+  "architecture": {
+    "title": "Discovery and static candidate assembly",
+    "nodes": [
+      {
+        "title": "Hub entries",
+        "detail": "Recent repository metadata"
+      },
+      {
+        "title": "Hardware profile",
+        "detail": "Detected or declared capacity"
+      },
+      {
+        "title": "Config DB",
+        "detail": "Candidate quant and backend"
+      },
+      {
+        "title": "ProbeCard builder",
+        "detail": "Static join; NOT_PROBED"
+      },
+      {
+        "title": "Report",
+        "detail": "List, fields and unknowns"
+      }
+    ],
+    "edges": [
+      [
+        0,
+        3
+      ],
+      [
+        1,
+        3
+      ],
+      [
+        2,
+        3
+      ],
+      [
+        3,
+        4
+      ]
+    ]
+  },
+  "process": {
+    "title": "Two declared memory profiles",
+    "steps": [
+      {
+        "title": "Declare candidates",
+        "detail": "Q4 4 GiB; Q8 8 GiB"
+      },
+      {
+        "title": "Declare RAM",
+        "detail": "8 GiB and 2 GiB CPU cases"
+      },
+      {
+        "title": "Select smallest",
+        "detail": "Q4 in both cases"
+      },
+      {
+        "title": "Keep probe unknown",
+        "detail": "No inference was run"
+      }
+    ],
+    "result": "Static true/null hints; smoke_probe_ok stays null."
+  },
+  "integrations": {
+    "title": "Current data interfaces",
+    "items": [
+      {
+        "title": "Hub metadata",
+        "detail": "Online discovery"
+      },
+      {
+        "title": "Hardware fields",
+        "detail": "Capacity information"
+      },
+      {
+        "title": "YAML configs",
+        "detail": "Maintainer declarations"
+      },
+      {
+        "title": "Python / JSON",
+        "detail": "Static data exchange"
+      }
+    ]
+  }
+}
