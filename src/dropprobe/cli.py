@@ -72,18 +72,21 @@ def latest(
     drops = fetch_weekly_drops(window_days=window, now=now)
     hw = detect_hardware(cache_dir=cache_dir)
 
-    # m2+: probe each drop. For m1, probe_drop() returns NOT_PROBED so we stay
-    # in the list view unless the user passed --json (m3 surfaces the static
-    # cards even before the live probe lands).
+    # m2+: probe each drop. Until then probe_drop() returns NOT_PROBED, so the
+    # cards carry the static config only. --json (m3) surfaces those static
+    # cards even before the live probe lands; plain human runs fall back to
+    # the list view below while every probe is NOT_PROBED.
     cards = None
     if not list_only:
         db = load_config_db()
         cards = [build_probe_card(d, hw, db, probe_drop(d, hw, db)) for d in drops]
-        # If every probe is NOT_PROBED, we're on m1 — show the list view and
-        # a one-line note rather than an empty ProbeCard table.
-        if all(c.smoke_probe_ok is None and c.runnable is not None for c in cards) or (
-            cards and all(_is_not_probed(c) for c in cards)
+        if (
+            not as_json
+            and cards
+            and all(_is_not_probed(c) for c in cards)
         ):
+            # m1: no live probe yet — a human gets drops + hardware rather
+            # than an all-"?" ProbeCard table.
             list_only = True
             typer.echo(
                 "  (smoke-probe lands in m2 — showing drops + hardware for now)", err=True
@@ -95,8 +98,9 @@ def latest(
 
 
 def _is_not_probed(card) -> bool:
-    # A card is "not probed" when its smoke_probe_ok is None AND it came from
-    # the NOT_PROBED path (runnable is the static VRAM-fit best-guess).
+    # A card is "not probed" when no live smoke-probe ran for it
+    # (smoke_probe_ok is None); runnable may still hold a static VRAM-fit
+    # best-guess, so it is not part of this predicate.
     return card.smoke_probe_ok is None
 
 
