@@ -1,10 +1,10 @@
 {
-  "version": "0.1.0",
+  "version": "0.2.0",
   "fixture": "Constructed model/config and declared CPU RAM profiles of 8 and 2 GiB; static card assembly only, no hardware detection, feed fetch or inference.",
   "steps": [
     {
       "command": "python examples/presentation_demo.py",
-      "output": "[\n  {\n    \"declared_ram_gb\": 8.0,\n    \"selected_quant\": \"Q4\",\n    \"runnable_field\": true,\n    \"probe_status\": \"not_probed\",\n    \"smoke_probe_ok\": null\n  },\n  {\n    \"declared_ram_gb\": 2.0,\n    \"selected_quant\": \"Q4\",\n    \"runnable_field\": null,\n    \"probe_status\": \"not_probed\",\n    \"smoke_probe_ok\": null\n  }\n]\n"
+      "output": "[\n  {\n    \"declared_ram_gb\": 8.0,\n    \"selected_quant\": \"Q4\",\n    \"runnable_field\": true,\n    \"probe_status\": \"not_probed\",\n    \"smoke_probe_ok\": null\n  },\n  {\n    \"declared_ram_gb\": 2.0,\n    \"selected_quant\": \"Q4\",\n    \"runnable_field\": false,\n    \"probe_status\": \"not_probed\",\n    \"smoke_probe_ok\": null\n  }\n]\n"
     }
   ]
 }

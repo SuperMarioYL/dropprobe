@@ -16,5 +16,5 @@ for ram in [8.0,2.0]:
                  'runnable_field':card.runnable,'probe_status':probe.status.value,
                  'smoke_probe_ok':card.smoke_probe_ok})
 print(json.dumps(rows,indent=2))
-assert rows[0]['runnable_field'] is True and rows[1]['runnable_field'] is None
+assert rows[0]['runnable_field'] is True and rows[1]['runnable_field'] is False
 assert all(row['smoke_probe_ok'] is None for row in rows)

@@ -35,7 +35,7 @@ __all__ = [
 ]
 
 
-class ProbeStatus(str, enum.Enum):
+class ProbeStatus(enum.StrEnum):
     """Outcome of a smoke-probe attempt on one drop."""
 
     OK = "ok"  # the 30s inference completed
@@ -124,7 +124,8 @@ def build_probe_card(
     """Assemble a :class:`ProbeCard` from the static config + (optional) probe.
 
     m1 calls this with ``result=None`` → the card's live axes are ``None``
-    ("not probed yet") and ``runnable`` falls back to static VRAM fit.
+    ("not probed yet") and ``runnable`` falls back to the static VRAM fit
+    (definite True/False when a curated quant exists, ``None`` otherwise).
     m2 will pass a real :class:`ProbeResult` from :func:`probe_drop`.
     """
 
@@ -135,8 +136,11 @@ def build_probe_card(
     context_len = cfg.context_len if cfg else 0
     result = result or ProbeResult(status=ProbeStatus.NOT_PROBED)
     runnable = result.runnable
-    if runnable is None:
-        runnable = _vr_fits(quant, hw) or None
+    if runnable is None and quant is not None:
+        # Static best-guess while the live probe is m2: a curated quant gets
+        # a definite fits / does-not-fit verdict. Only an unknown drop (no
+        # curated config) stays None ("?").
+        runnable = _vr_fits(quant, hw)
     run_cmd = _render_run_cmd(drop, quant, backend)
     return ProbeCard(
         model_id=drop.model_id,

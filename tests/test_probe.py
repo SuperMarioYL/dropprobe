@@ -83,7 +83,9 @@ def test_build_probe_card_vram_does_not_fit():
     hw = HardwareProfile(12.0, 32.0, 200.0, "nvidia", "RTX 3060", 1)
     db = load_config_db()
     card = build_probe_card(drop, hw, db)
-    assert card.runnable is False or card.runnable is None
+    # A curated quant that provably does not fit gets a definite "no"
+    # verdict — not the "?" (None) reserved for unknown drops.
+    assert card.runnable is False
 
 
 def test_build_probe_card_unknown_drop_has_no_config():
@@ -95,6 +97,8 @@ def test_build_probe_card_unknown_drop_has_no_config():
     assert card.backend is None
     assert card.context_len == 0
     assert card.smoke_probe_ok is None
+    # No curated quant → no static fit verdict either ("?").
+    assert card.runnable is None
     assert "no curated config yet" in card.run_cmd
 
 
