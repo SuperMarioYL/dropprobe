@@ -90,7 +90,7 @@ Static GPU arithmetic reserves roughly 1.5 GiB; CPU mode compares RAM without es
 
 ## Recorded demo
 
-Real static-assembly API output from v0.1.0. Model, backend and hardware values are constructed inputs, not downloads, detected hardware or successful inference records.
+Real static-assembly API output from v0.2.0. Model, backend and hardware values are constructed inputs, not downloads, detected hardware or inference records.
 
 [Inputs, commands and complete output](docs/demo-results.json)
 

@@ -2,7 +2,7 @@
 [0.231, "o", "\u001b[?2004h$ \u001b[?2004l"]
 [0.612, "o", "dropprobe latest --list"]
 [1.182, "o", "\r\n"]
-[1.31, "o", "DropProbe 0.1.0 — fetching the last 7d of drops...\r\n"]
+[1.31, "o", "DropProbe 0.2.0 — fetching the last 7d of drops...\r\n"]
 [2.04, "o", "\r\n"]
 [2.1, "o", "This week's open-weight drops                       \r\n"]
 [2.11, "o", "\u001b(0lqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqwqqqqqqqqqqqwqqqqqqqqqqwqqqqqqw\u001b(0x\r\n"]

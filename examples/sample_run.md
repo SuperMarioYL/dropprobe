@@ -6,7 +6,7 @@ This is what using DropProbe looks like on a typical Friday after a carousel dro
 
 ```console
 $ dropprobe latest --list
-DropProbe 0.1.0 — fetching the last 7d of drops...
+DropProbe 0.2.0 — fetching the last 7d of drops...
 
 This week's open-weight drops
  Model                                  Lab       Drop date   Files
