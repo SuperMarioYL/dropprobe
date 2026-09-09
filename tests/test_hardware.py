@@ -97,3 +97,65 @@ def test_hardware_to_jsonable_roundtrip():
     assert d["vram_gb"] == 24.0
     assert d["gpu_arch"] == "nvidia"
     assert d["gpu_name"] == "RTX 5090"
+
+
+# --- detect_hardware: single detection pass, arch matches the winning detector
+def _fake_psutil(monkeypatch):
+    fake_psutil = types.SimpleNamespace(
+        virtual_memory=lambda: types.SimpleNamespace(total=64 * 1024 ** 3),
+        disk_usage=lambda _p: types.SimpleNamespace(free=200 * 1024 ** 3),
+    )
+    monkeypatch.setattr(hw_mod, "psutil", fake_psutil)
+
+
+def test_detect_hardware_nvidia_single_pass(monkeypatch):
+    """detect_hardware invokes the NVIDIA detector exactly once and labels
+    gpu_arch "nvidia" — no second NVML round-trip that could flake."""
+
+    calls = []
+
+    def fake_nvidia():
+        calls.append(1)
+        return (24.0, "NVIDIA GeForce RTX 5090", 1)
+
+    monkeypatch.setattr(hw_mod, "_detect_nvidia", fake_nvidia)
+    monkeypatch.setattr(hw_mod, "_detect_rocm", lambda: None)
+    _fake_psutil(monkeypatch)
+
+    profile = hw_mod.detect_hardware()
+
+    assert len(calls) == 1
+    assert profile.gpu_arch == "nvidia"
+    assert profile.vram_gb == 24.0
+    assert profile.gpu_name == "NVIDIA GeForce RTX 5090"
+    assert profile.device_count == 1
+    assert profile.is_cpu_only is False
+
+
+def test_detect_hardware_rocm_labels_amd(monkeypatch):
+    """A successful rocm-smi detection labels gpu_arch "amd"."""
+
+    monkeypatch.setattr(hw_mod, "_detect_nvidia", lambda: None)
+    monkeypatch.setattr(hw_mod, "_detect_rocm", lambda: (16.0, "AMD Radeon RX 7900 XTX", 1))
+    _fake_psutil(monkeypatch)
+
+    profile = hw_mod.detect_hardware()
+
+    assert profile.gpu_arch == "amd"
+    assert profile.vram_gb == 16.0
+    assert profile.device_count == 1
+
+
+def test_detect_hardware_no_detector_cpu_profile(monkeypatch):
+    """Both detectors failing → CPU-only profile with zeroed GPU axes."""
+
+    monkeypatch.setattr(hw_mod, "_detect_nvidia", lambda: None)
+    monkeypatch.setattr(hw_mod, "_detect_rocm", lambda: None)
+    _fake_psutil(monkeypatch)
+
+    profile = hw_mod.detect_hardware()
+
+    assert profile.gpu_arch == "cpu"
+    assert profile.vram_gb == 0.0
+    assert profile.device_count == 0
+    assert profile.gpu_name == ""

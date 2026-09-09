@@ -43,7 +43,7 @@ class HardwareProfile:
     """A snapshot of the local box's inference-relevant resources.
 
     Attributes:
-        vram_gb: Total GPU VRAM across visible devices, in GiB (10^30 bytes
+        vram_gb: Total GPU VRAM across visible devices, in GiB (bytes
             divided by 2^30). 0.0 on a CPU-only rig — see ``gpu_arch``.
         ram_gb: Total system RAM in GiB.
         disk_free_gb: Free disk on the volume holding the model cache, in GiB.
@@ -189,6 +189,10 @@ def _detect_disk_free(path: str = "") -> float:
 def detect_hardware(*, cache_dir: str = "") -> HardwareProfile:
     """Build a :class:`HardwareProfile` for the current box.
 
+    Runs each GPU detector at most once, so ``gpu_arch`` always names the
+    detector that actually produced the VRAM / name / count (no second
+    NVML round-trip that could flake and mislabel an NVIDIA box as "amd").
+
     Args:
         cache_dir: Where model weights would land. Disk-free is measured on
             this volume so the "does it fit" arithmetic is honest.
@@ -197,20 +201,27 @@ def detect_hardware(*, cache_dir: str = "") -> HardwareProfile:
         A frozen profile. GPU axes are zero/empty on a CPU-only rig.
     """
 
-    vram_gb, gpu_name, device_count = detect_vram()
-    if device_count == 0:
-        gpu_arch = "cpu"
-    elif _detect_nvidia() is not None:
-        gpu_arch = "nvidia"
-    else:
-        gpu_arch = "amd"
+    ram_gb = _detect_ram()
+    disk_free_gb = _detect_disk_free(cache_dir)
+    for detector, arch in ((_detect_nvidia, "nvidia"), (_detect_rocm, "amd")):
+        result = detector()
+        if result is not None:
+            vram_gb, gpu_name, device_count = result
+            return HardwareProfile(
+                vram_gb=vram_gb,
+                ram_gb=ram_gb,
+                disk_free_gb=disk_free_gb,
+                gpu_arch=arch,
+                gpu_name=gpu_name,
+                device_count=device_count,
+            )
     return HardwareProfile(
-        vram_gb=vram_gb,
-        ram_gb=_detect_ram(),
-        disk_free_gb=_detect_disk_free(cache_dir),
-        gpu_arch=gpu_arch,
-        gpu_name=gpu_name,
-        device_count=device_count,
+        vram_gb=0.0,
+        ram_gb=ram_gb,
+        disk_free_gb=disk_free_gb,
+        gpu_arch="cpu",
+        gpu_name="",
+        device_count=0,
     )
 
 
