@@ -11,7 +11,8 @@
   "meta": {
     "visual_profile": "neon-particle",
     "demo_source": "docs/demo-results.json",
-    "implementation_version": "0.1.0"
+    "content_version": "v0.2.0",
+    "implementation_version": "0.2.0"
   },
   "hero": {
     "eyebrow": {
@@ -175,8 +176,8 @@
       "en": "Run the supplied example"
     },
     "note": {
-      "zh": "v0.1.0 的真实静态组装 API 输出。所有模型、后端和硬件值均为构造输入，不是下载、实际机器检测或推理成功记录。",
-      "en": "Real static-assembly API output from v0.1.0. Model, backend and hardware values are constructed inputs, not downloads, detected hardware or successful inference records."
+      "zh": "v0.2.0 的真实静态组装 API 输出。所有模型、后端和硬件值均为构造输入，不是下载、实际机器检测或推理成功记录。",
+      "en": "Real static-assembly API output from v0.2.0. Model, backend and hardware values are constructed inputs, not downloads, detected hardware or successful inference records."
     },
     "source": "https://github.com/SuperMarioYL/dropprobe/blob/main/docs/demo-results.json",
     "steps": [
