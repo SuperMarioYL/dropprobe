@@ -19,7 +19,7 @@ from typing import Any
 
 try:
     import yaml
-except ImportError:  # pragma: no cover - PyYAML is a hard dep via huggingface_hub
+except ImportError:  # pragma: no cover - PyYAML is a hard dep in pyproject
     yaml = None  # type: ignore[assignment]
 
 __all__ = [

@@ -7,6 +7,8 @@ never raise on a CPU-only rig (the Kimi-K3-on-CPU reddit case).
 
 from __future__ import annotations
 
+import subprocess
+import sys
 import types
 
 import dropprobe.hardware as hw_mod
@@ -159,3 +161,17 @@ def test_detect_hardware_no_detector_cpu_profile(monkeypatch):
     assert profile.vram_gb == 0.0
     assert profile.device_count == 0
     assert profile.gpu_name == ""
+
+
+def test_import_raises_no_future_warning():
+    """dropprobe depends on nvidia-ml-py, which ships the ``pynvml`` module
+    without the deprecation FutureWarning that the pynvml 13.x redirector
+    shim emits. Import in a fresh subprocess (import-time warnings fire once
+    per interpreter, so an in-process import may be cached)."""
+
+    code = (
+        "import warnings; "
+        "warnings.simplefilter('error', FutureWarning); "
+        "import dropprobe.hardware"
+    )
+    subprocess.run([sys.executable, "-c", code], check=True)
