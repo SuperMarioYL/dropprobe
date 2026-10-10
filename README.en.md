@@ -51,7 +51,7 @@ python -m pip install -e .
 python examples/presentation_demo.py
 ```
 
-The example explicitly declares CPU RAM profiles of 8 GiB and 2 GiB, with 4 GiB Q4 and 8 GiB Q8 candidates. Both select the smallest candidate, Q4. runnable is true for the first and null for the second, but both have not_probed status and null smoke_probe_ok. Here true is only a static capacity hint.
+The example explicitly declares CPU RAM profiles of 8 GiB and 2 GiB, with 4 GiB Q4 and 8 GiB Q8 candidates. Both select the smallest candidate, Q4. runnable is true for the first and false for the second (it does not fit the declared RAM), but both have not_probed status and null smoke_probe_ok. runnable is only a static capacity hint, not proof of a successful run.
 
 ## Usage
 
@@ -90,7 +90,7 @@ Static GPU arithmetic reserves roughly 1.5 GiB; CPU mode compares RAM without es
 
 ## Recorded demo
 
-Real static-assembly API output from v0.2.0. Model, backend and hardware values are constructed inputs, not downloads, detected hardware or inference records.
+Real static-assembly API output from v0.3.0. Model, backend and hardware values are constructed inputs, not downloads, detected hardware or inference records.
 
 [Inputs, commands and complete output](docs/demo-results.json)
 

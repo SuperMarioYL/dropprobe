@@ -2,11 +2,11 @@
 
 This is what using DropProbe looks like on a typical Friday after a carousel drop.
 
-## 1. List the week's drops + your hardware (m1)
+## 1. List the week's drops + your hardware
 
 ```console
 $ dropprobe latest --list
-DropProbe 0.2.0 — fetching the last 7d of drops...
+DropProbe 0.3.0 — fetching the last 7d of drops...
 
 This week's open-weight drops
  Model                                  Lab       Drop date   Files
@@ -26,19 +26,31 @@ Your hardware
  Disk free (GiB)  512.0
 ```
 
-## 2. Smoke-probe each drop (m2)
+## 2. Probe status
+
+`dropprobe latest` assembles a ProbeCard per drop, but live inference probing
+is not wired in yet. When no probe has run, the command falls back to the
+drops + hardware view and says so:
 
 ```console
 $ dropprobe latest
-# ... fires a 30s test inference per drop via llama.cpp / ollama ...
+DropProbe 0.3.0 — fetching the last 7d of drops...
+  (no probe ran — showing drops + hardware for now)
+
+This week's open-weight drops
+ ...
 ```
 
-## 3. Copy the runnable command (m3)
+## 3. Read the candidate run command
 
-The row for the drop you care about ends with a copy-paste `run_cmd`, e.g.:
+Each ProbeCard (visible via `dropprobe latest --json`) carries a candidate
+`run_cmd` assembled from the bundled config DB, e.g.:
 
 ```bash
 llama.cpp/kimi-k3-text -m Q2_K.gguf -c 4096 -n 128 --no-warmup
 ```
 
-Paste it into your terminal — the model runs. That's the whole point: no fork-hunting, no quant-guessing, per drop, every week.
+These are maintainer-curated templates, not validated commands — check the
+actual backend arguments before running one. The static fit verdict (`runnable`)
+tells you whether the candidate quant fits your hardware; the final "it runs"
+check is still yours.

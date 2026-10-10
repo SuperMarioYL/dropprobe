@@ -51,7 +51,7 @@ python -m pip install -e .
 python examples/presentation_demo.py
 ```
 
-示例显式声明 8 GiB 与 2 GiB 两种 CPU RAM，候选 Q4 为 4 GiB、Q8 为 8 GiB。两种情况下都选最小候选 Q4；前者 runnable 字段为 true，后者为 null，但两者 probe_status 均为 not_probed，smoke_probe_ok 均为 null。true 在这里仅是静态容量提示。
+示例显式声明 8 GiB 与 2 GiB 两种 CPU RAM，候选 Q4 为 4 GiB、Q8 为 8 GiB。两种情况下都选最小候选 Q4；前者 runnable 字段为 true，后者为 false（按声明容量装不下），两者 probe_status 均为 not_probed，smoke_probe_ok 均为 null。runnable 在这里仅是静态容量提示，不是运行成功的证明。
 
 ## 用法
 
@@ -90,7 +90,7 @@ dropprobe --version
 
 ## 运行记录
 
-v0.2.0 的真实静态组装 API 输出。所有模型、后端和硬件值均为构造输入，不是下载、实际机器检测或推理成功记录。
+v0.3.0 的真实静态组装 API 输出。所有模型、后端和硬件值均为构造输入，不是下载、实际机器检测或推理成功记录。
 
 [输入、命令和完整输出](docs/demo-results.json)
 
