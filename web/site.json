@@ -11,8 +11,8 @@
   "meta": {
     "visual_profile": "neon-particle",
     "demo_source": "docs/demo-results.json",
-    "content_version": "v0.2.0",
-    "implementation_version": "0.2.0"
+    "content_version": "v0.3.0",
+    "implementation_version": "0.3.0"
   },
   "hero": {
     "eyebrow": {
@@ -69,12 +69,12 @@
     },
     {
       "title": {
-        "zh": "保留离线接口",
-        "en": "Keep an offline interface"
+        "zh": "分清空周与断网",
+        "en": "Tell a quiet week from an outage"
       },
       "body": {
-        "zh": "Python API 可用显式输入检查静态组装，无需下载权重。",
-        "en": "The Python API accepts explicit inputs for static assembly without downloading weights."
+        "zh": "Hub 查询全部失败时明确提示可能断网，空的更新列表不再与安静的一周混淆。",
+        "en": "When every Hub query fails, DropProbe says so — an empty drop list is no longer indistinguishable from a quiet week."
       }
     }
   ],
@@ -96,8 +96,8 @@
           "en": "From input to result"
         },
         "body": {
-          "zh": "示例显式声明 8 GiB 与 2 GiB 两种 CPU RAM，候选 Q4 为 4 GiB、Q8 为 8 GiB。两种情况下都选最小候选 Q4；前者 runnable 字段为 true，后者为 null，但两者 probe_status 均为 not_probed，smoke_probe_ok 均为 null。true 在这里仅是静态容量提示。",
-          "en": "The example explicitly declares CPU RAM profiles of 8 GiB and 2 GiB, with 4 GiB Q4 and 8 GiB Q8 candidates. Both select the smallest candidate, Q4. runnable is true for the first and null for the second, but both have not_probed status and null smoke_probe_ok. Here true is only a static capacity hint."
+          "zh": "示例显式声明 8 GiB 与 2 GiB 两种 CPU RAM，候选 Q4 为 4 GiB、Q8 为 8 GiB。两种情况下都选最小候选 Q4；前者 runnable 字段为 true，后者为 false（按声明容量装不下），两者 probe_status 均为 not_probed，smoke_probe_ok 均为 null。runnable 在这里仅是静态容量提示。",
+          "en": "The example explicitly declares CPU RAM profiles of 8 GiB and 2 GiB, with 4 GiB Q4 and 8 GiB Q8 candidates. Both select the smallest candidate, Q4. runnable is true for the first and false for the second (it does not fit the declared RAM), but both have not_probed status and null smoke_probe_ok. runnable is only a static capacity hint."
         },
         "image": {
           "light": "/assets/presentation/process-light.svg",
@@ -176,8 +176,8 @@
       "en": "Run the supplied example"
     },
     "note": {
-      "zh": "v0.2.0 的真实静态组装 API 输出。所有模型、后端和硬件值均为构造输入，不是下载、实际机器检测或推理成功记录。",
-      "en": "Real static-assembly API output from v0.2.0. Model, backend and hardware values are constructed inputs, not downloads, detected hardware or successful inference records."
+      "zh": "v0.3.0 的真实静态组装 API 输出。所有模型、后端和硬件值均为构造输入，不是下载、实际机器检测或推理成功记录。",
+      "en": "Real static-assembly API output from v0.3.0. Model, backend and hardware values are constructed inputs, not downloads, detected hardware or successful inference records."
     },
     "source": "https://github.com/SuperMarioYL/dropprobe/blob/main/docs/demo-results.json",
     "steps": [
@@ -187,13 +187,13 @@
           "en": "Run 1"
         },
         "body": {
-          "zh": "示例显式声明 8 GiB 与 2 GiB 两种 CPU RAM，候选 Q4 为 4 GiB、Q8 为 8 GiB。两种情况下都选最小候选 Q4；前者 runnable 字段为 true，后者为 null，但两者 probe_status 均为 not_probed，smoke_probe_ok 均为 null。true 在这里仅是静态容量提示。",
-          "en": "The example explicitly declares CPU RAM profiles of 8 GiB and 2 GiB, with 4 GiB Q4 and 8 GiB Q8 candidates. Both select the smallest candidate, Q4. runnable is true for the first and null for the second, but both have not_probed status and null smoke_probe_ok. Here true is only a static capacity hint."
+          "zh": "示例显式声明 8 GiB 与 2 GiB 两种 CPU RAM，候选 Q4 为 4 GiB、Q8 为 8 GiB。两种情况下都选最小候选 Q4；前者 runnable 字段为 true，后者为 false（按声明容量装不下），两者 probe_status 均为 not_probed，smoke_probe_ok 均为 null。runnable 在这里仅是静态容量提示。",
+          "en": "The example explicitly declares CPU RAM profiles of 8 GiB and 2 GiB, with 4 GiB Q4 and 8 GiB Q8 candidates. Both select the smallest candidate, Q4. runnable is true for the first and false for the second (it does not fit the declared RAM), but both have not_probed status and null smoke_probe_ok. runnable is only a static capacity hint."
         },
         "image": "/assets/presentation/demo-0-light.svg",
         "imageDark": "/assets/presentation/demo-0-dark.svg",
         "command": "python examples/presentation_demo.py",
-        "output": "[\n  {\n    \"declared_ram_gb\": 8.0,\n    \"selected_quant\": \"Q4\",\n    \"runnable_field\": true,\n    \"probe_status\": \"not_probed\",\n    \"smoke_probe_ok\": null\n  },\n  {\n    \"declared_ram_gb\": 2.0,\n    \"selected_quant\": \"Q4\",\n    \"runnable_field\": null,\n    \"probe_status\": \"not_probed\",\n    \"smoke_probe_ok\": null\n  }\n]\n"
+        "output": "[\n  {\n    \"declared_ram_gb\": 8.0,\n    \"selected_quant\": \"Q4\",\n    \"runnable_field\": true,\n    \"probe_status\": \"not_probed\",\n    \"smoke_probe_ok\": null\n  },\n  {\n    \"declared_ram_gb\": 2.0,\n    \"selected_quant\": \"Q4\",\n    \"runnable_field\": false,\n    \"probe_status\": \"not_probed\",\n    \"smoke_probe_ok\": null\n  }\n]\n"
       }
     ]
   },
