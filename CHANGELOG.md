@@ -4,6 +4,31 @@ All notable changes to DropProbe are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] — 2026-10-11
+
+### Fixed
+
+- The README quickstart (zh + en) now reports the recorded demo's actual
+  result for the 2 GiB profile: `runnable` is `false` (a definite static
+  does-not-fit verdict), not `null`. The stale text predated the v0.2.0
+  definite-verdict change and contradicted `docs/demo-results.json` and
+  `examples/presentation_demo.py`'s own assertion.
+- `examples/sample_run.md` no longer presents `dropprobe latest` as firing
+  live 30-second inferences per drop — it shows the real behavior: ProbeCards
+  are assembled statically and a human run falls back to the drops +
+  hardware view while nothing has been probed. Internal milestone labels
+  (m1/m2/m3) were removed from the user-facing sample and CLI strings; the
+  fallback note now reads "no probe ran — showing drops + hardware for now".
+
+### Added
+
+- `dropprobe latest` now distinguishes an unreachable Hugging Face Hub from
+  a genuinely quiet carousel: when every organization query fails, a stderr
+  warning says the empty drop list may be a network problem. The new
+  `fetch_carousel()` returns a `CarouselFetch` outcome (drops plus
+  `orgs_queried` / `orgs_failed`); `fetch_weekly_drops()` keeps its
+  `list[Drop]` return as a thin wrapper, so existing callers are unaffected.
+
 ## [0.2.0] — 2026-09-09
 
 ### Fixed

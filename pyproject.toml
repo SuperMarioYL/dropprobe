@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "dropprobe"
-version = "0.2.0"
+version = "0.3.0"
 description = "List recent model-repository updates, inspect local hardware and assemble static candidate configurations; live inference probing is not implemented."
 readme = "README.md"
 license = "MIT"

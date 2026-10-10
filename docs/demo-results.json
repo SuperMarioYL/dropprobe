@@ -1,5 +1,5 @@
 {
-  "version": "0.2.0",
+  "version": "0.3.0",
   "fixture": "Constructed model/config and declared CPU RAM profiles of 8 and 2 GiB; static card assembly only, no hardware detection, feed fetch or inference.",
   "steps": [
     {
