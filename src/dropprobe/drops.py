@@ -22,7 +22,7 @@ try:  # network + HF client are optional at import time so unit tests can
 except ImportError:  # pragma: no cover
     httpx = None  # type: ignore[assignment]
 
-__all__ = ["Drop", "LabSource", "LAB_SOURCES", "fetch_weekly_drops"]
+__all__ = ["Drop", "LabSource", "LAB_SOURCES", "CarouselFetch", "fetch_carousel", "fetch_weekly_drops"]
 
 
 # --- lab registry -----------------------------------------------------------
@@ -86,6 +86,33 @@ class Drop:
 _HUB_API = "https://huggingface.co/api/models"
 
 
+@dataclasses.dataclass(frozen=True)
+class CarouselFetch:
+    """Outcome of one carousel fetch — the drops plus per-org reachability.
+
+    ``fetch_weekly_drops`` collapses this to just ``drops``; callers that
+    need to distinguish "the carousel was quiet" from "the Hub was
+    unreachable" use :func:`fetch_carousel` directly.
+
+    Attributes:
+        drops: Drops published within the window, newest-first.
+        orgs_queried: How many org endpoints were queried (labs + aliases).
+        orgs_failed: How many of those queries failed (offline / 5xx / rate
+            limit). When this equals ``orgs_queried`` the empty ``drops``
+            list means the Hub was unreachable, not a quiet week.
+    """
+
+    drops: list[Drop]
+    orgs_queried: int
+    orgs_failed: int
+
+    @property
+    def all_orgs_failed(self) -> bool:
+        """True when every org query failed (the empty list is a network gap)."""
+
+        return self.orgs_queried > 0 and self.orgs_failed == self.orgs_queried
+
+
 def _within_window(drop_date: str, window_days: int, now: datetime) -> bool:
     """True if ``drop_date`` falls inside ``[now - window_days, now]``."""
 
@@ -107,7 +134,13 @@ def _query_org(org: str, *, limit: int, timeout: float) -> list[dict[str, Any]]:
 
     if httpx is None:  # pragma: no cover - httpx is a hard dep in pyproject
         return []
-    params = {"author": org, "limit": limit, "full": "true", "sort": "lastModified", "direction": "-1"}
+    params: dict[str, str | int] = {
+        "author": org,
+        "limit": limit,
+        "full": "true",
+        "sort": "lastModified",
+        "direction": "-1",
+    }
     resp = httpx.get(_HUB_API, params=params, timeout=timeout)
     resp.raise_for_status()
     data = resp.json()
@@ -141,23 +174,26 @@ def _to_drop(model: dict[str, Any], lab: LabSource) -> Drop:
     )
 
 
-def fetch_weekly_drops(
+def fetch_carousel(
     *,
     window_days: int = 7,
     now: datetime | None = None,
     per_lab_limit: int = 15,
     timeout: float = 15.0,
-) -> list[Drop]:
+) -> CarouselFetch:
     """Fetch this week's carousel drops from the curated lab / HF sources.
 
     Walks :data:`LAB_SOURCES`, queries the HuggingFace Hub for each org's most
     recent models, and keeps only those published inside the trailing
-    ``window_days`` window. Returns drops newest-first.
+    ``window_days`` window. Returns the drops (newest-first) plus how many
+    org queries failed, so callers can tell a quiet week from an unreachable
+    Hub (:attr:`CarouselFetch.all_orgs_failed`).
 
     Degrades gracefully: a per-org HTTP failure is logged-and-skipped so one
     flaky lab never blanks the whole carousel. If *every* org is unreachable
-    (offline box, no network), returns an empty list — :func:`fetch_weekly_drops`
-    never raises on network errors, only on programmer mistakes.
+    (offline box, no network), ``drops`` is empty and ``all_orgs_failed`` is
+    True — the fetch never raises on network errors, only on programmer
+    mistakes.
 
     Args:
         window_days: Trailing window in days (default 7 — the carousel cadence).
@@ -167,20 +203,26 @@ def fetch_weekly_drops(
         timeout: Per-request HTTP timeout in seconds.
 
     Returns:
-        Drops published within the window, newest-first.
+        A :class:`CarouselFetch` with the in-window drops (newest-first,
+        deduped by model_id) and the per-org query counts.
     """
 
     now = now or datetime.now(UTC)
     drops: list[Drop] = []
+    orgs_queried = 0
+    orgs_failed = 0
     for lab in LAB_SOURCES:
         orgs = (lab.org, *lab.aliases)
         for org in orgs:
+            orgs_queried += 1
             try:
                 records = _query_org(org, limit=per_lab_limit, timeout=timeout)
             except Exception:
-                # Offline / 5xx / rate-limit — skip this org, keep going.
-                # A carousel where one lab's Hub hiccups blanks *all* drops is
-                # worse than one that's missing one lab for a day.
+                # Offline / 5xx / rate-limit — count it and skip this org,
+                # keep going. A carousel where one lab's Hub hiccups blanks
+                # *all* drops is worse than one that's missing one lab for a
+                # day; counting the failures keeps the blank case diagnosable.
+                orgs_failed += 1
                 continue
             for rec in records:
                 try:
@@ -197,7 +239,29 @@ def fetch_weekly_drops(
             continue
         seen.add(d.model_id)
         unique.append(d)
-    return unique
+    return CarouselFetch(drops=unique, orgs_queried=orgs_queried, orgs_failed=orgs_failed)
+
+
+def fetch_weekly_drops(
+    *,
+    window_days: int = 7,
+    now: datetime | None = None,
+    per_lab_limit: int = 15,
+    timeout: float = 15.0,
+) -> list[Drop]:
+    """Fetch this week's carousel drops (compat wrapper over :func:`fetch_carousel`).
+
+    Same args and degradation behavior; returns just the drops, newest-first.
+    Callers that need the per-org reachability outcome use
+    :func:`fetch_carousel` instead.
+    """
+
+    return fetch_carousel(
+        window_days=window_days,
+        now=now,
+        per_lab_limit=per_lab_limit,
+        timeout=timeout,
+    ).drops
 
 
 def drops_to_jsonable(drops: Sequence[Drop]) -> list[dict[str, Any]]:
