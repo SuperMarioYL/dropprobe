@@ -1,10 +1,10 @@
 """DropProbe CLI.
 
-Single entry point: ``dropprobe latest``. m1 ships ``--list`` (fetch this
-week's drops + detect local hardware, no probing). ``dropprobe latest``
-without ``--list`` will, in m2, run the smoke-probes; for m1 it prints the
-same list view with a one-line "probing lands in m2" note so the happy path
-is demonstrable today. ``--json`` (m3) exports the full ProbeCard report.
+Single entry point: ``dropprobe latest``. ``--list`` shows this week's drops
++ local hardware without assembling ProbeCards; plain ``latest`` assembles
+the static ProbeCards, and while no live probe has run (probe_drop still
+returns NOT_PROBED) a human run falls back to the same list view with a
+one-line "no probe ran" note. ``--json`` exports the full report.
 """
 
 from __future__ import annotations
@@ -15,7 +15,7 @@ import typer
 
 from . import __version__
 from .config_db import load_config_db
-from .drops import fetch_weekly_drops
+from .drops import fetch_carousel
 from .hardware import detect_hardware
 from .probe import build_probe_card, probe_drop
 from .report import print_report
@@ -48,10 +48,10 @@ def _main(
 @app.command()
 def latest(
     list_only: bool = typer.Option(
-        False, "--list", help="Only list this week's drops + your hardware (m1). Skip probing.",
+        False, "--list", help="Only list this week's drops + your hardware. Skip probing.",
     ),
     as_json: bool = typer.Option(
-        False, "--json", help="Export the full report as JSON (m3).",
+        False, "--json", help="Export the full report as JSON.",
     ),
     window: int = typer.Option(
         7, "--window", "-w", min=1, max=90, help="Trailing window in days (carousel cadence).",
@@ -60,22 +60,28 @@ def latest(
         "", "--cache-dir", help="Model cache dir (used to measure free disk).",
     ),
 ) -> None:
-    """Fetch this week's drops, detect your hardware, and (m2+) smoke-probe each.
+    """Fetch this week's drops, detect your hardware, and assemble each drop's config.
 
-    m1: ``dropprobe latest --list`` shows the carousel + your box.
-    m2: ``dropprobe latest`` adds the 30s smoke-probe per drop.
-    m3: ``dropprobe latest --json`` exports the full ProbeCard report.
+    --list shows the carousel + your box without assembling ProbeCards.
+    --json exports the full report (drops, hardware, ProbeCards) as JSON.
     """
 
     now = datetime.now(UTC)
     typer.echo(f"DropProbe {__version__} — fetching the last {window}d of drops...", err=True)
-    drops = fetch_weekly_drops(window_days=window, now=now)
+    fetch = fetch_carousel(window_days=window, now=now)
+    drops = fetch.drops
+    if fetch.all_orgs_failed:
+        typer.echo(
+            f"  warning: all {fetch.orgs_queried} Hugging Face Hub queries failed — "
+            "the empty drop list may be a network problem",
+            err=True,
+        )
     hw = detect_hardware(cache_dir=cache_dir)
 
-    # m2+: probe each drop. Until then probe_drop() returns NOT_PROBED, so the
-    # cards carry the static config only. --json (m3) surfaces those static
-    # cards even before the live probe lands; plain human runs fall back to
-    # the list view below while every probe is NOT_PROBED.
+    # probe_drop() still returns NOT_PROBED, so the cards carry the static
+    # config only. --json surfaces those static cards even before the live
+    # probe lands; plain human runs fall back to the list view below while
+    # every probe is NOT_PROBED.
     cards = None
     if not list_only:
         db = load_config_db()
@@ -85,11 +91,11 @@ def latest(
             and cards
             and all(_is_not_probed(c) for c in cards)
         ):
-            # m1: no live probe yet — a human gets drops + hardware rather
-            # than an all-"?" ProbeCard table.
+            # No live probe ran — a human gets drops + hardware rather than
+            # an all-"?" ProbeCard table.
             list_only = True
             typer.echo(
-                "  (smoke-probe lands in m2 — showing drops + hardware for now)", err=True
+                "  (no probe ran — showing drops + hardware for now)", err=True
             )
 
     if list_only:
